@@ -1,0 +1,8 @@
+.idea/
+cmake-build-debug
+main
+main.c
+CMakeLists.txt
+penmp
+a.out
+avg_calc

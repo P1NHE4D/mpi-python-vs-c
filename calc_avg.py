@@ -16,7 +16,7 @@ def main():
     # Set a_size and generate array
     if rank == 0:
         a_size = int(input(f'Enter the desired size of the array: '))
-        array = np.random.randint(-100000, 100000, a_size * size, dtype='i')
+        array = np.random.randint(0, 10, a_size * size, dtype='i')
 
     # Broadcast a_size to all processes, set recvbuf
     a_size = comm.bcast(a_size, root=0)

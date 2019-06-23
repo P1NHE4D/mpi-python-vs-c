@@ -17,10 +17,10 @@ int main(int argc, char** argv) {
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    int a_size = 10000000;
+    int a_size = 100000000;
     int *arr = NULL;
-    clock_t start, stop;
-    double calc_time;
+    clock_t start, stop, mpi_start, mpi_stop;
+    double calc_time, mpi_calc_time;
 
     // Generate random array
     if (rank == 0) {
@@ -33,7 +33,10 @@ int main(int argc, char** argv) {
     int *recv_buf = malloc(sizeof(int) * a_size);
 
     // Scatter data
+    mpi_start = clock();
     MPI_Scatter(arr, a_size, MPI_INT, recv_buf, a_size, MPI_INT, 0, MPI_COMM_WORLD);
+    mpi_stop = clock();
+    mpi_calc_time = ((double) mpi_stop - mpi_start) / CLOCKS_PER_SEC;
 
     // Calculate average of sub-array
     double avg;
@@ -45,7 +48,10 @@ int main(int argc, char** argv) {
     if (rank == 0) {
         avgs = malloc(sizeof(double) * size);
     }
+    mpi_start = clock();
     MPI_Gather(&avg, 1, MPI_DOUBLE, avgs, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpi_stop = clock();
+    mpi_calc_time = mpi_calc_time + ((double) mpi_stop - mpi_start) / CLOCKS_PER_SEC;
 
     // Calculate total average
     if (rank == 0) {
@@ -58,6 +64,7 @@ int main(int argc, char** argv) {
         stop = clock();
         calc_time = ((double) (stop - start)) / CLOCKS_PER_SEC;
         printf("Total avg: %f | calc_time: %f sec. \n", total_avg, calc_time);
+        printf("MPI calc time: %f \n", mpi_calc_time);
     }
 
     MPI_Finalize();

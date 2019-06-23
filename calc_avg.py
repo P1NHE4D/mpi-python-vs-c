@@ -24,8 +24,11 @@ def main():
     recvbuf = np.zeros(a_size, dtype='i')
 
     # Distribute data and calculate average of sub-array
+    mpi_start = time.time()
     comm.Scatter(array, recvbuf, root=0)
-    avg = calc_avg(recvbuf)
+    mpi_stop = time.time()
+    mpi_calc_time = mpi_stop - mpi_start
+    avg = np.array(calc_avg(recvbuf))
 
     # Calculate calculation time of worker processes
     if rank != 0:
@@ -34,20 +37,27 @@ def main():
         sys.stdout.flush()
 
     # Gather data
-    ls = comm.gather(avg, root=0)
+    avgs = None
+    if rank == 0:
+        avgs = np.zeros(size)
+    mpi_start = time.time()
+    comm.Gather(avg, avgs, root=0)
+    mpi_stop = time.time()
+    mpi_calc_time = mpi_calc_time + (mpi_stop - mpi_start)
 
     if rank == 0:
         # Calculate total average
-        total_avg = calc_avg(ls)
+        total_avg = calc_avg(avgs)
         stop = time.time() - start
         print(f'Parallel calculation | Total average: {total_avg} | Total Calc_time: {stop} sec.')
+        print(f'MPI calc time: {mpi_calc_time}')
         sys.stdout.flush()
 
         # Serial calculation
-        serial_start = time.time()
-        avg = calc_avg(array)
-        serial_stop = time.time() - serial_start
-        print(f'Serial calculation | Total avg: {avg} | Calc_time: {serial_stop} sec.')
+        # serial_start = time.time()
+        # avg = calc_avg(array)
+        # serial_stop = time.time() - serial_start
+        # print(f'Serial calculation | Total avg: {avg} | Calc_time: {serial_stop} sec.')
 
 
 # Calculates the average of the elements in an array

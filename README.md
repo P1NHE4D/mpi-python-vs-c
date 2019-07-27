@@ -1,6 +1,5 @@
 # About this project
-I recently started experimenting with MPI and the mpi4py package for python.
+This project compares the performance of mpi in python and mpi in c. The comparison is based on a simple algorithm that calculates the average of the elements in an integer array. The results were quite impressive. Even though I used the optimized functions to transfer buffer-like objects only in order to reduce overhead as much as possible, python was significantly slower than C. 
 
-Since MPI and parallel programming in general are quite interesting topics to work with, I decided to spend some more time working with it. Hence, I will update this repository with new and interesting ways to take advantage of MPI.
-
-The folder c contains some c files for performance comparison.
+Additionally, I've implemented a parallel merge sort algorithm to illustrate the boost in performance that can be achieved by 
+implementing a parallel algorithm rather than a serial algorithm. 
